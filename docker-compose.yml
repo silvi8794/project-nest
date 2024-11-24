@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb:10.5
+    container_name: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: nestjs_db
+      MYSQL_USER: nestjs
+      MYSQL_PASSWORD: nestjspassword
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - backend
+
+  nestjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nestjs-app
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mariadb
+    environment:
+      - DATABASE_HOST=mariadb
+      - DATABASE_PORT=3306
+      - DATABASE_USER=nestjs
+      - DATABASE_PASSWORD=nestjspassword
+      - DATABASE_NAME=nestjs_db
+    command: [ "npm", "run", "start"] 
+    networks:
+      - backend
+    volumes:
+      - .:/usr/src/app
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+    networks:
+      - backend
+
+volumes:
+   mariadb_data:
+
+networks:
+   backend:
+    driver: bridge
