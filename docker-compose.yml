@@ -17,28 +17,6 @@ services:
     networks:
       - backend
 
-  nestjs:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: nestjs-app
-    restart: always
-    ports:
-      - "3000:3000"
-    depends_on:
-      - mariadb
-    environment:
-      - DATABASE_HOST=mariadb
-      - DATABASE_PORT=3306
-      - DATABASE_USER=nestjs
-      - DATABASE_PASSWORD=nestjspassword
-      - DATABASE_NAME=nestjs_db
-    command: [ "npm", "run", "start"] 
-    networks:
-      - backend
-    volumes:
-      - .:/usr/src/app
-
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin

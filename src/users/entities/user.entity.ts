@@ -35,5 +35,5 @@ export class User {
     @ManyToOne(() => Role, (role) => role.id, { 
         eager: true 
     })
-    role: Role
+    role: string
 }

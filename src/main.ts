@@ -15,7 +15,7 @@ async function bootstrap() {
     .build();
     
 
-    app.setGlobalPrefix('api/v1');
+    app.setGlobalPrefix(process.env.GLOBAL_PREFIX);
 
 
   app.useGlobalPipes(new ValidationPipe({ 
@@ -25,7 +25,7 @@ async function bootstrap() {
   }));
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, documentFactory);
-  await app.listen(3000);
+  await app.listen(process.env.PORT || 3333);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
