@@ -20,7 +20,7 @@ export const RolesFactory = async (dataSource: DataSource) => {
     },
   ];
   await roleRepository.save(rolesList);
-  //return rolesList;
+
 };
 
 export { Role } from './role.entity';

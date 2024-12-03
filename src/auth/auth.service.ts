@@ -4,7 +4,6 @@ import {
   Injectable, 
   InternalServerErrorException, 
   NotFoundException, 
-  Req, 
   UnauthorizedException,
 } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
@@ -68,9 +67,11 @@ export class AuthService {
     }
 
   const payload = {
-    email: user.email
+    email: user.email,
+    role: user.role['name']
   };
 
+  
   const token = await this.jwtService.signAsync(payload);
 
   return {

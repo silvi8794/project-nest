@@ -31,7 +31,10 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<User> {
-    return await this.userRepository.findOneBy({ email });
+    return await this.userRepository.findOne({ 
+      where: { email },
+      relations: ['role']
+    });
   }
 
   async remove(id: number) : Promise<void>{
