@@ -5,21 +5,72 @@ import { LoginDto } from './dto/login.dto';
 import { JwtAccessTokenGuard } from './guards/jwt-access-token/jwt-access-token.guard';
 import { Request } from 'express';
 import { RequestWithUser } from './interfaces/interfaces';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-@Controller('auth')
+@ApiTags('auth')
+@Controller('auth') //Categoriza los endpoints de Auth
 export class AuthController {
   constructor(
     private readonly authService: AuthService
   ) {}
-
-  @Post('login')
+/**
+ * Login with credentials and returns an access token
+ * @param loginDto : email and password
+ * 
+ */
+@Post('login')
+@ApiOperation({ summary: 'Log in with credentials' })
+@ApiBody({ 
+    description: 'Login credentials',
+    type: LoginDto 
+  })
+@ApiResponse({ 
+    status: 200, 
+    description: 'User logged in successfully. Returns an access token',
+    schema: {
+     example:{
+      accessToken: 'jwt-access-token-example',
+      user: {
+        email: 'user@example.com',
+        role: 'admin'
+      }
+     },
+  },
+})
+@ApiResponse({ 
+  status: 400, 
+  description: 'Invalid credentials' 
+})
   async login(
     @Body() loginDto: LoginDto
   ) {
     return await this.authService.login(loginDto);
   }
 
-  @Post('register')
+/**
+* Register a new user
+* @param registerDto : name,email, password and role
+*/
+@Post('register')
+@ApiOperation({ summary: 'Register a new user' })
+@ApiBody({ 
+    description: 'Data required to register a new user',
+    type: RegisterDto 
+  })
+@ApiResponse({ 
+    status: 200, 
+    description: 'User registered successfully',
+    schema: {
+      example: {
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+        role: 'admin'
+      },
+    },
+  })
+  @ApiResponse({ status: 409, description: 'Email already in use'})
+  @ApiResponse({ status: 404, description: 'Role not found'})
+  @ApiResponse({ status: 500, description: 'Internal server error'})
   async register(
     @Body() registerDto: RegisterDto
   ) {
