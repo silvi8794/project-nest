@@ -1,5 +1,5 @@
 import { IsEmail } from "class-validator";
-import { Role } from "src/role/entities/role.entity";
+import { Role } from "../../role/entities/role.entity";
 import { 
     Column, 
     Entity, 

@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { 
+  ConflictException, 
+  Injectable, 
+  NotFoundException 
+} from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -29,7 +33,12 @@ export class RoleService {
   }
 
   async findByName(name: string) {
-    return await this.roleRepository.findOneBy({ name });
+    const role = await this.roleRepository.findOneBy({ name });
+
+    if (!role){
+      throw new NotFoundException('Role not found');
+    }
+    return role;
   }
 
   async update(id: number, updateRoleDto: UpdateRoleDto) {

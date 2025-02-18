@@ -1,43 +1,90 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { RegisterDto } from 'src/auth/dto/register.dto';
+import { omit } from 'lodash';
 
 @Injectable()
 export class UsersService {
-  
+
   constructor(
     @InjectRepository(User)
-    
+
     private userRepository: Repository<User>,
-  ) {}
+  ) { }
 
 
- async create(
-  {name, email, password, role}
+  async create(
+    { name, email, password, role }
   ) {
-    const user = this.userRepository.create({name, email, password, role});
-    return await this.userRepository.save(user);
+    const existingUser = await this.userRepository.findOne({
+      where: { email },
+      relations: ['role'],
+     },
+    );
+
+    if (existingUser) {
+      throw new ConflictException('User already exists');
+    }
+
+    const user = this.userRepository.create({
+      name,
+      email,
+      password,
+      role, 
+    });
+  
+
+    try {
+      await this.userRepository.save(user);
+
+      return omit(user, [
+        'password',
+        'createdAt',
+        'updatedAt',
+        'deletedAt',
+        'role.createdAt',
+        'role.updatedAt',
+        'role.deletedAt'
+      ]);
+    } catch (error) {
+
+      throw new InternalServerErrorException('Failed to create user');
+    }
+
   }
 
   async findAll(): Promise<User[]> {
     return await this.userRepository.find();
   }
 
-  
+
   async findOne(id: number): Promise<User> {
-    return await this.userRepository.findOneBy({ id });
+    return await this.userRepository.findOne({ 
+      where: {id },
+      relations: ['role'],
+  });
   }
 
   async findByEmail(email: string): Promise<User> {
-    return await this.userRepository.findOne({ 
+    if (!email) {
+      throw new BadRequestException('Email is required');
+    }
+    const user = await this.userRepository.findOne({
       where: { email },
       relations: ['role']
     });
+
+    return user || null;
   }
 
-  async remove(id: number) : Promise<void>{
+  async remove(id: number): Promise<void> {
     await this.userRepository.delete(id);
   }
 }
