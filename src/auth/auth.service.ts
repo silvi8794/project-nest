@@ -7,11 +7,12 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcryptjs';
-import { RoleService } from 'src/role/role.service';
+import { RoleService } from '../role/role.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { omit } from 'lodash'
 
 @Injectable()
 export class AuthService {
@@ -43,7 +44,7 @@ export class AuthService {
         password: await bcrypt.hash(password, 10),
         role: existingRole
       });
-      delete user.password;
+      
       return user;
     } catch (error) {
       throw new InternalServerErrorException('Failed to create user');
