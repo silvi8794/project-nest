@@ -9,7 +9,7 @@ describe('JwtAccessTokenGuard', () => {
 
   beforeEach(async () => {
     mockJwtService = {
-      verify: jest.fn().mockReturnValue({ userId: 1 }),
+      verifyAsync: jest.fn().mockReturnValue({ userId: 1 }),
       sign: jest.fn().mockReturnValue('mocked-token'),
     };
 
@@ -29,7 +29,7 @@ describe('JwtAccessTokenGuard', () => {
     expect(guard).toBeDefined();
   });
 
- /* it('should verify the token', async () => {
+  it('should verify the token', async () => {
     const mockContext ={
       switchToHttp: jest.fn().mockReturnValue({
         getRequest: jest.fn().mockReturnValue({
@@ -37,8 +37,12 @@ describe('JwtAccessTokenGuard', () => {
         }),
       }),
     } as unknown as ExecutionContext;
+
     const result = await guard.canActivate(mockContext); 
     expect(result).toBe(true);
-    expect(mockJwtService.verify).toHaveBeenCalledWith('mocked-token'); 
-  });*/
+    expect(mockJwtService.verifyAsync).toHaveBeenCalledWith('mocked-token', {
+      secret: process.env.JWT_SECRET,
+      ignoreExpiration: false
+    }); 
+  });
 });

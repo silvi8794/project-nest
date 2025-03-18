@@ -81,6 +81,9 @@ export class RoleController {
       ]
     }
   })
+  @Roles(RoleList.ADMIN)
+  @ApiBearerAuth()
+  @UseGuards(JwtAccessTokenGuard, RolesGuard)
   @ApiResponse({ status: 403, description: 'Forbidden. Role not allowed to get all Roles' })
   findAll() {
     return this.roleService.findAll();

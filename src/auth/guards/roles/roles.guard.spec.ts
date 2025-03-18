@@ -1,7 +1,7 @@
 import { RolesGuard } from './roles.guard';
 import { Reflector } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ExecutionContext } from '@nestjs/common';
+import { ExecutionContext, ForbiddenException } from '@nestjs/common';
 
 describe('RolesGuard', () => {
   let guard: RolesGuard;
@@ -9,7 +9,7 @@ describe('RolesGuard', () => {
 
   beforeEach(async () => {
     mockReflector = {
-      get: jest.fn().mockReturnValue(['admin']),
+      getAllAndOverride: jest.fn().mockReturnValue(['admin']),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -28,31 +28,34 @@ describe('RolesGuard', () => {
     expect(guard).toBeDefined();
   });
 
- /* it('should return true if user has required role', async () => {
+  it('should return true if user has required role', async () => {
     const mockContext = {
       switchToHttp: jest.fn().mockReturnValue({
         getRequest: jest.fn().mockReturnValue({
-          user: { role: 'admin' }, // Simulamos un usuario con rol 'admin'
+          user: { role: 'admin' },
         }),
       }),
+      getHandler: jest.fn().mockReturnValue({}),
+      getClass: jest.fn().mockReturnValue({}),
     } as unknown as ExecutionContext;
+
 
     const result = await guard.canActivate(mockContext);
 
-    expect(result).toBe(true);  // Espera que la activación pase si el usuario tiene el rol adecuado
+    expect(result).toBe(true);
   });
 
   it('should return false if user does not have required role', async () => {
     const mockContext = {
       switchToHttp: jest.fn().mockReturnValue({
         getRequest: jest.fn().mockReturnValue({
-          user: { role: 'user' }, // Simulamos un usuario con rol 'user'
+          user: { role: 'user' },
         }),
       }),
+      getHandler: jest.fn().mockReturnValue({}),
+      getClass: jest.fn().mockReturnValue({}),
     } as unknown as ExecutionContext;
 
-    const result = await guard.canActivate(mockContext);
-
-    expect(result).toBe(false);  // Espera que la activación falle si el usuario no tiene el rol adecuado
-  });*/
+    expect(() => guard.canActivate(mockContext)).toThrow(ForbiddenException);
+  });
 });
