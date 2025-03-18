@@ -61,15 +61,27 @@ export class UsersService {
   }
 
   async findAll(): Promise<User[]> {
-    return await this.userRepository.find();
+    const users = await this.userRepository.find();
+
+    users.forEach( user => {
+      delete user.password
+    });
+
+    return users;
   }
 
 
   async findOne(id: number): Promise<User> {
-    return await this.userRepository.findOne({ 
+    const user = await this.userRepository.findOne({ 
       where: {id },
       relations: ['role'],
   });
+
+  if (user){
+    delete user.password
+  }
+
+  return user;
   }
 
   async findByEmail(email: string): Promise<User> {
