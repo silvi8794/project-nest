@@ -12,7 +12,7 @@ import * as bcrypt from 'bcryptjs';
 import { RoleService } from '../role/role.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
-import { omit } from 'lodash'
+
 
 @Injectable()
 export class AuthService {
@@ -57,7 +57,7 @@ export class AuthService {
   @Body() {email, password}: LoginDto
  ) {
     const user = await this.usersService.findByEmail(email);
-
+ 
     if (!user) {
       throw new UnauthorizedException('Email or password is incorrect');
     }
